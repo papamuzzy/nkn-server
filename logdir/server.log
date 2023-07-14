@@ -1,0 +1,8 @@
+SERVER	2023/07/14 11:36:15.933438 /home/muzzy/GolandProjects/pelenium/nkn-server/log/logger.go:28: Logger MyLog started
+SERVER	2023/07/14 11:36:15.935509 /home/muzzy/GolandProjects/pelenium/nkn-server/db/mongo.go:33: Pinged your deployment. You successfully connected to MongoDB!
+SERVER	2023/07/14 11:36:15.935536 /home/muzzy/GolandProjects/pelenium/nkn-server/main.go:38: Server will start at http://localhost:9999/
+SERVER	2023/07/13 22:17:56.702717 /home/muzzy/GolandProjects/pelenium/nkn-server/handlers/node.go:22: Route NodesGet Started
+SERVER	2023/07/13 22:18:30.251437 /home/muzzy/GolandProjects/pelenium/nkn-server/handlers/node.go:22: Route NodesGet Started
+:11.309903 /home/muzzy/GolandProjects/pelenium/nkn-server/node/add.go:28: there no node with such ip
+SERVER	2023/07/13 15:03:11.609149 /home/muzzy/GolandProjects/pelenium/nkn-server/node/add.go:49: &{ObjectID("64afe7ff4737523198a0d0ff")}
+4:09.933997 /home/muzzy/GolandProjects/pelenium/nkn-server/node/add.go:49: <nil>
