@@ -10,6 +10,7 @@ import (
 	"nkn-server/log"
 	"nkn-server/node"
 	"strconv"
+	"strings"
 )
 
 type RequestData struct {
@@ -53,17 +54,13 @@ func NodeAdd(w http.ResponseWriter, r *http.Request) {
 }
 
 func NodeMake(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-
 	reqBody, _ := io.ReadAll(r.Body)
 	/*var req RequestData
 	json.Unmarshal(reqBody, &req)*/
 
-	ip := gjson.Get(string(reqBody), "ip").String()
+	ip := strings.Split(strings.TrimSpace(gjson.Get(string(reqBody), "ip").String()), " ")[0]
 
-	if ip != "" {
-		go node.Make(ip)
-	}
+	go node.Make(ip)
 
 	var resp map[string]interface{}
 	resp = make(map[string]interface{})
@@ -71,7 +68,6 @@ func NodeMake(w http.ResponseWriter, r *http.Request) {
 	resp["Route"] = "NodeMake"
 	resp["Request"] = fmt.Sprintf("%#v", r)
 	resp["Ip"] = ip
-	resp["Vars"] = vars
 
 	response := UserResponse{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"resp": resp}}
 

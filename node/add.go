@@ -3,7 +3,9 @@ package node
 import (
 	"context"
 	"fmt"
+	mainlog "log"
 	"nkn-server/block"
+	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -33,6 +35,17 @@ func Add(ip string, generationId int) {
 }
 
 func Make(ip string) {
+	file := config.DirRoot + "/logdir/Make_" + time.Now().Format("2006-01-02_15-04-05") + ".log"
+
+	mFile, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE, 0666)
+	if err != nil {
+		mainlog.Println(err)
+	}
+	defer mFile.Close()
+
+	makeLog := mainlog.New(mFile, "SERVER\t", mainlog.Ldate|mainlog.Ltime|mainlog.Lmicroseconds|mainlog.Llongfile)
+	makeLog.Println("Logger MyLog started, IP ", ip)
+
 	start := time.Now()
 
 	block.NodesMutex.Lock()
@@ -50,13 +63,15 @@ func Make(ip string) {
 
 	client, err := ssh.Dial("tcp", fmt.Sprintf("%s:22", ip), conf)
 	if err != nil {
-		log.MyLog.Println(err)
+		makeLog.Println(err)
 	}
+	makeLog.Println("SSH client -- YES!")
 
 	session, err := client.NewSession()
 	if err != nil {
-		log.MyLog.Println(err)
+		makeLog.Println(err)
 	}
+	makeLog.Println("SSH session -- YES!")
 
 	script := fmt.Sprintf(`
 		#!/bin/bash
@@ -108,18 +123,18 @@ func Make(ip string) {
 
 	output, err := session.CombinedOutput(script)
 	if err != nil {
-		log.MyLog.Println(err)
+		makeLog.Println(err)
 	}
-	log.MyLog.Println(string(output))
+	makeLog.Println(string(output))
 
 	client.Close()
 	session.Close()
 
-	log.MyLog.Println("ran script successfully")
+	makeLog.Println("ran script successfully")
 
 	total := time.Now().Sub(start).Seconds()
 
-	log.MyLog.Println("Create node IP ", ip, " total time ", total, " sec")
+	makeLog.Println("Create node IP ", ip, " total time ", total, " sec")
 }
 
 func NewNode(ip string, generationId int) {
