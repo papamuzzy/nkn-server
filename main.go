@@ -7,6 +7,7 @@ import (
 	"nkn-server/db"
 	"nkn-server/handlers"
 	"nkn-server/log"
+	"nkn-server/node"
 )
 
 func main() {
@@ -16,6 +17,8 @@ func main() {
 
 	db.Start()
 	defer db.Stop()
+
+	go node.UpdateBase()
 
 	initRouter()
 }
@@ -28,7 +31,7 @@ func initRouter() {
 	nodeRouter.HandleFunc("", handlers.NodesGet).Methods("GET")
 	nodeRouter.HandleFunc("/add", handlers.NodeAdd).Methods("POST")
 	nodeRouter.HandleFunc("/make", handlers.NodeMake).Methods("POST")
-	nodeRouter.HandleFunc("/{id:[0-9]+}", handlers.NodeDelete).Methods("DELETE")
+	nodeRouter.HandleFunc("/delete", handlers.NodeDelete).Methods("POST")
 
 	genRouter := router.PathPrefix("/generation").Subrouter()
 	genRouter.HandleFunc("/count", handlers.GenerationCount).Methods("GET")

@@ -1,2 +1,2 @@
-UPDATE	2023/07/14 11:36:15.933555 /home/muzzy/GolandProjects/pelenium/nkn-server/log/logger.go:41: Logger UpdateLog started
-ed
+UPDATE	2023/07/15 13:35:17.772892 /home/muzzy/GolandProjects/pelenium/nkn-server/log/logger.go:41: Logger UpdateLog started
+UPDATE	2023/07/15 13:35:18.261186 /home/muzzy/GolandProjects/pelenium/nkn-server/node/update.go:24: error decoding key height: cannot decode string into an integer type

@@ -7,8 +7,8 @@ import (
 	"nkn-server/log"
 )
 
-func Delete(generation int) {
-	filter := bson.D{{"generation", generation}}
+func Delete(ip string) {
+	filter := bson.D{{"ip", ip}}
 	_, err := db.NodeCollection.DeleteOne(context.TODO(), filter)
 	if err != nil {
 		log.MyLog.Println(err)

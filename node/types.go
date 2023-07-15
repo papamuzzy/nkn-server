@@ -8,7 +8,7 @@ type DataNode struct {
 	ID              primitive.ObjectID `bson:"_id,omitempty"`
 	Ip              string             `bson:"ip" validate:"required"`
 	Generation      int                `bson:"generation" validate:"required"`
-	Height          string             `bson:"height"`
+	Height          int                `bson:"height"`
 	Version         string             `bson:"version"`
 	WorkTime        string             `bson:"work_time"`
 	MinedEver       int                `bson:"mined_ever"`

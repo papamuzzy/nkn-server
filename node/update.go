@@ -28,6 +28,9 @@ func UpdateBase() {
 			actualTime := now.Format(time.DateTime)
 			nowDay := now.Day()
 
+			if res.LastUpdate == "-" {
+				res.LastUpdate = actualTime
+			}
 			lastUpdate, err1 := time.Parse(time.DateTime, res.LastUpdate)
 			if err1 != nil {
 				log.UpdateLog.Println(err1)
@@ -63,7 +66,7 @@ func UpdateBase() {
 
 				if nowDay != lastUpdateDay {
 					update := bson.D{
-						{"set",
+						{"$set",
 							bson.D{
 								{"height", height},
 								{"version", version},
@@ -84,7 +87,7 @@ func UpdateBase() {
 					log.UpdateLog.Println(result)
 				} else {
 					update := bson.D{
-						{"set",
+						{"$set",
 							bson.D{
 								{"height", height},
 								{"version", version},
@@ -106,9 +109,9 @@ func UpdateBase() {
 			} else {
 				if res.NodeStatus != "OFFLINE" {
 					update := bson.D{
-						{"set",
+						{"$set",
 							bson.D{
-								{"height", "-"},
+								{"height", 0},
 								{"version", "-"},
 								{"work_time", "-"},
 								{"mined_ever", 0},
@@ -134,7 +137,7 @@ func UpdateBase() {
 					delta := now.Sub(t)
 					if delta.Hours() > 24 {
 						block.NodesMutex.Lock()
-						Delete(res.Generation)
+						Delete(res.Ip)
 						block.NodesMutex.Unlock()
 					}
 				}

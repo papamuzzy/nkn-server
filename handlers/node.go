@@ -3,13 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
 	"github.com/tidwall/gjson"
 	"io"
 	"net/http"
 	"nkn-server/log"
 	"nkn-server/node"
-	"strconv"
 	"strings"
 )
 
@@ -80,21 +78,10 @@ func NodeMake(w http.ResponseWriter, r *http.Request) {
 func NodeDelete(w http.ResponseWriter, r *http.Request) {
 	log.MyLog.Println("Route NodeDelete Started")
 
-	vars := mux.Vars(r)
-	generationId, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		log.MyLog.Println(err)
-	}
-
-	node.Delete(generationId)
-
 	reqBody, _ := io.ReadAll(r.Body)
-	/*var req RequestData
-	json.Unmarshal(reqBody, &req)*/
+	ip := strings.Split(strings.TrimSpace(gjson.Get(string(reqBody), "ip").String()), " ")[0]
 
-	ip := gjson.Get(string(reqBody), "ip").String()
-	exists := gjson.Get(string(reqBody), "exists").Bool()
-	generation := gjson.Get(string(reqBody), "generation_id").Int()
+	node.Delete(ip)
 
 	var resp map[string]interface{}
 	resp = make(map[string]interface{})
@@ -102,9 +89,6 @@ func NodeDelete(w http.ResponseWriter, r *http.Request) {
 	resp["Route"] = "NodeDelete"
 	resp["Request"] = fmt.Sprintf("%#v", r)
 	resp["Ip"] = ip
-	resp["Generation"] = generation
-	resp["Exists"] = exists
-	resp["Vars"] = vars
 
 	response := UserResponse{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"resp": resp}}
 

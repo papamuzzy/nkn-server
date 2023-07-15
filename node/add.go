@@ -142,7 +142,7 @@ func NewNode(ip string, generationId int) {
 		ID:              primitive.NewObjectID(),
 		Ip:              ip,
 		Generation:      generationId,
-		Height:          "-",
+		Height:          0,
 		Version:         "-",
 		WorkTime:        "-",
 		MinedEver:       0,
