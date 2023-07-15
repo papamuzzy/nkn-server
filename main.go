@@ -20,20 +20,6 @@ func main() {
 	initRouter()
 }
 
-/*
-Routes:
-router.GET("/", handlers.PermissionDenied)
-router.POST("/", handlers.NodeIpPOST(db))
-
-router.POST("/delete", handlers.Delete(db))
-
-router.GET("/api", handlers.ApiGET(db))
-router.GET("/usage", handlers.GetGenerationNumber)
-
-router.GET("/generations/:fileName", handlers.GetGeneration)
-
-router.GET("/my-nodes", handlers.MyNodesGET) html-page
-*/
 func initRouter() {
 	log.MyLog.Println("Server will start at http://localhost:9999/")
 
@@ -52,9 +38,6 @@ func initRouter() {
 
 	router.PathPrefix("/").HandlerFunc(handlers.CatchAll)
 
-	/*http.Handle("/", ghandlers.CombinedLoggingHandler(os.Stdout, http.FileServer(http.Dir("."))))
-	log.Fatal(http.ListenAndServe(":9999", loggingHandler(router)))*/
-
 	srv := &http.Server{
 		Addr:     config.ServerAddr,
 		ErrorLog: log.MyLog,
@@ -64,10 +47,3 @@ func initRouter() {
 	err := srv.ListenAndServe()
 	log.MyLog.Fatal(err)
 }
-
-/*func loggingHandler(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println(r.Method, r.URL.Path)
-		h.ServeHTTP(w, r)
-	})
-}*/
