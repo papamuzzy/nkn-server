@@ -8,6 +8,7 @@ import (
 	"nkn-server/block"
 	"nkn-server/db"
 	"nkn-server/log"
+	"nkn-server/xtime"
 	"time"
 )
 
@@ -25,16 +26,13 @@ func UpdateBase() {
 		}
 		for _, res := range nodes {
 			now := time.Now()
-			actualTime := now.Format(time.DateTime)
+			actualTime := xtime.ToStr(now)
 			nowDay := now.Day()
 
 			if res.LastUpdate == "-" {
 				res.LastUpdate = actualTime
 			}
-			lastUpdate, err1 := time.Parse(time.DateTime, res.LastUpdate)
-			if err1 != nil {
-				log.UpdateLog.Println(err1)
-			}
+			lastUpdate := xtime.FromStr(res.LastUpdate)
 			lastUpdateDay := lastUpdate.Day()
 
 			filter := bson.D{{"ip", res.Ip}}
@@ -80,11 +78,10 @@ func UpdateBase() {
 						},
 					}
 
-					result, err := db.NodeCollection.UpdateOne(context.TODO(), filter, update)
+					_, err := db.NodeCollection.UpdateOne(context.TODO(), filter, update)
 					if err != nil {
 						log.UpdateLog.Println(err)
 					}
-					log.UpdateLog.Println(result)
 				} else {
 					update := bson.D{
 						{"$set",
@@ -100,11 +97,10 @@ func UpdateBase() {
 						},
 					}
 
-					result, err := db.NodeCollection.UpdateOne(context.TODO(), filter, update)
+					_, err := db.NodeCollection.UpdateOne(context.TODO(), filter, update)
 					if err != nil {
 						log.UpdateLog.Println(err)
 					}
-					log.UpdateLog.Println(result)
 				}
 			} else {
 				if res.NodeStatus != "OFFLINE" {
@@ -117,23 +113,18 @@ func UpdateBase() {
 								{"mined_ever", 0},
 								{"mined_today", 0},
 								{"node_status", "OFFLINE"},
-								{"last_update", time.Now().Format(time.DateTime)},
-								{"last_offline_time", time.Now().Format(time.DateTime)},
+								{"last_update", xtime.ToStr(time.Now())},
+								{"last_offline_time", xtime.ToStr(time.Now())},
 							},
 						},
 					}
 
-					result, err := db.NodeCollection.UpdateOne(context.TODO(), filter, update)
+					_, err := db.NodeCollection.UpdateOne(context.TODO(), filter, update)
 					if err != nil {
 						log.UpdateLog.Println(err)
 					}
-					log.UpdateLog.Println(result)
 				} else {
-					t, err := time.Parse(time.DateTime, res.LastOfflineTime)
-					if err != nil {
-						log.UpdateLog.Println(err)
-					}
-
+					t := xtime.FromStr(res.LastOfflineTime)
 					delta := now.Sub(t)
 					if delta.Hours() > 24 {
 						block.NodesMutex.Lock()

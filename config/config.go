@@ -8,15 +8,19 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strconv"
 )
 
 var IsDebug bool
 var IsTest bool
+var Ip string
+var Port int
+var NodeNum int
 var DirRoot string
 var MongoUri string
 var MongoBase string
 var MongoCollection string
-var Ip string
+var MongoCollection2 string
 var SshUser string
 var SshPassw string
 var ServerLog string
@@ -38,11 +42,21 @@ func Start() {
 	MongoUri = os.Getenv("MONGO_URI")
 	MongoBase = os.Getenv("MONGO_BASE")
 	MongoCollection = os.Getenv("MONGO_COLLECTION")
+	MongoCollection2 = os.Getenv("MONGO_COLLECTION2")
 
 	SshUser = os.Getenv("SSH_USER")
 	SshPassw = os.Getenv("SSH_PASSWORD")
 
 	Ip = os.Getenv("IP")
+	Port, err = strconv.Atoi(os.Getenv("PORT"))
+	if err != nil {
+		log.Fatalf("Port error. Err: %s", err)
+	}
+
+	NodeNum, err = strconv.Atoi(os.Getenv("NODE_NUMBER"))
+	if err != nil {
+		NodeNum = 1
+	}
 
 	/*minProfit, _ = strconv.ParseFloat(os.Getenv("MIN_PROFIT"), 64)
 	maxLevel, _ = strconv.Atoi(os.Getenv("MAX_LEVEL"))

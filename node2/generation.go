@@ -1,4 +1,4 @@
-package node
+package node2
 
 import (
 	"context"
@@ -15,7 +15,7 @@ func GetGenerationId() int {
 	var id int
 	for id = 1; true; id++ {
 		filter := bson.D{{"generation", id}}
-		count, err := db.NodeCollection.CountDocuments(context.TODO(), filter)
+		count, err := db.Node2Collection.CountDocuments(context.TODO(), filter)
 		if err != nil {
 			log.MyLog.Println(err)
 		}
@@ -29,7 +29,7 @@ func GetGenerationId() int {
 }
 
 func GetGenerationsCount() int {
-	dir := config.DirRoot + "/public/generations/1/"
+	dir := config.DirRoot + "/public/generations/2/"
 	count := 0
 
 	err := filepath.Walk(dir, func(path string, info fs.FileInfo, err error) error {

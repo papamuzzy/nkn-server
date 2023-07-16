@@ -1,10 +1,12 @@
-package node
+package node2
 
 import (
 	"context"
 	"fmt"
+	"golang.org/x/crypto/ssh"
 	mainlog "log"
 	"nkn-server/block"
+	"nkn-server/config"
 	"nkn-server/script"
 	"nkn-server/xtime"
 	"os"
@@ -12,18 +14,16 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"golang.org/x/crypto/ssh"
-	"nkn-server/config"
 	"nkn-server/db"
 	"nkn-server/log"
 )
 
 func Add(ip string, generationId int) {
-	block.NodesMutex.Lock()
-	defer block.NodesMutex.Unlock()
+	block.Nodes2Mutex.Lock()
+	defer block.Nodes2Mutex.Unlock()
 
 	filter := bson.D{{"ip", ip}}
-	count, err := db.NodeCollection.CountDocuments(context.TODO(), filter)
+	count, err := db.Node2Collection.CountDocuments(context.TODO(), filter)
 	if err != nil {
 		log.MyLog.Println(err)
 	}
@@ -37,7 +37,7 @@ func Add(ip string, generationId int) {
 }
 
 func Make(ip string) {
-	file := config.DirRoot + "/logdir/Make_" + time.Now().Format("2006-01-02_15-04-05") + ".log"
+	file := config.DirRoot + "/logdir/Make2_" + time.Now().Format("2006-01-02_15-04-05") + ".log"
 
 	mFile, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
@@ -46,14 +46,14 @@ func Make(ip string) {
 	defer mFile.Close()
 
 	makeLog := mainlog.New(mFile, "SERVER\t", mainlog.Ldate|mainlog.Ltime|mainlog.Lmicroseconds|mainlog.Llongfile)
-	makeLog.Println("Logger MyLog started, IP ", ip)
+	makeLog.Println("Logger MyLog2 started, IP ", ip)
 
 	start := time.Now()
 
-	block.NodesMutex.Lock()
+	block.Nodes2Mutex.Lock()
 	generationId := GetGenerationId()
 	NewNode(ip, generationId)
-	block.NodesMutex.Unlock()
+	block.Nodes2Mutex.Unlock()
 
 	conf := &ssh.ClientConfig{
 		User: config.SshUser,
@@ -75,11 +75,7 @@ func Make(ip string) {
 	}
 	makeLog.Println("SSH session -- YES!")
 
-	strScript := script.GetString("/1/install.sh", generationId, makeLog)
-
-	if config.NodeNum > 1 {
-		strScript += script.GetString("/1/add.sh", generationId, makeLog)
-	}
+	strScript := script.GetString("/2/install.sh", generationId, makeLog)
 
 	output, err := session.CombinedOutput(strScript)
 	if err != nil {
@@ -103,19 +99,13 @@ func NewNode(ip string, generationId int) {
 		ID:              primitive.NewObjectID(),
 		Ip:              ip,
 		Generation:      generationId,
-		Height:          0,
-		Version:         "-",
-		WorkTime:        "-",
-		MinedEver:       0,
-		MinedToday:      0,
 		NodeStatus:      "OFFLINE",
-		LastBlockNumber: 0,
 		Created:         now,
 		LastUpdate:      now,
 		LastOfflineTime: now,
 	}
 
-	result, err := db.NodeCollection.InsertOne(context.TODO(), newNode)
+	result, err := db.Node2Collection.InsertOne(context.TODO(), newNode)
 	if err != nil {
 		log.MyLog.Println(err)
 	}

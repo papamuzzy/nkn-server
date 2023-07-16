@@ -8,6 +8,7 @@ import (
 	"nkn-server/handlers"
 	"nkn-server/log"
 	"nkn-server/node"
+	"nkn-server/node2"
 )
 
 func main() {
@@ -19,6 +20,9 @@ func main() {
 	defer db.Stop()
 
 	go node.UpdateBase()
+	if config.NodeNum > 1 {
+		go node2.UpdateBase()
+	}
 
 	initRouter()
 }
@@ -32,6 +36,14 @@ func initRouter() {
 	nodeRouter.HandleFunc("/add", handlers.NodeAdd).Methods("POST")
 	nodeRouter.HandleFunc("/make", handlers.NodeMake).Methods("POST")
 	nodeRouter.HandleFunc("/delete", handlers.NodeDelete).Methods("POST")
+
+	if config.NodeNum > 1 {
+		node2Router := router.PathPrefix("/node2").Subrouter()
+		node2Router.HandleFunc("", handlers.Nodes2Get).Methods("GET")
+		node2Router.HandleFunc("/add", handlers.Node2Add).Methods("POST")
+		node2Router.HandleFunc("/make", handlers.Node2Make).Methods("POST")
+		node2Router.HandleFunc("/delete", handlers.Node2Delete).Methods("POST")
+	}
 
 	genRouter := router.PathPrefix("/generation").Subrouter()
 	genRouter.HandleFunc("/count", handlers.GenerationCount).Methods("GET")

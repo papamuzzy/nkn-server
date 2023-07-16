@@ -13,6 +13,7 @@ import (
 var Client *mongo.Client
 var DataBase *mongo.Database
 var NodeCollection *mongo.Collection
+var Node2Collection *mongo.Collection
 
 func Start() {
 	// Use the SetServerAPIOptions() method to set the Stable API version to 1
@@ -34,6 +35,7 @@ func Start() {
 
 	DataBase = Client.Database(config.MongoBase)
 	NodeCollection = DataBase.Collection(config.MongoCollection)
+	Node2Collection = DataBase.Collection(config.MongoCollection)
 }
 
 func Stop() {

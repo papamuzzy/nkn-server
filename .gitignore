@@ -22,3 +22,6 @@ go.work
 /.env
 /main
 /public/generations/*.tar
+/scriptfiles/
+/public/generations/1/*.tar
+/public/generations/2/*.tar
