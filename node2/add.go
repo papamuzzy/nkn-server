@@ -52,45 +52,47 @@ func Make(ip string) {
 
 	block.Nodes2Mutex.Lock()
 	generationId := GetGenerationId()
-	NewNode(ip, generationId)
-	block.Nodes2Mutex.Unlock()
+	if generationId <= GetGenerationsCount() {
+		NewNode(ip, generationId)
+		block.Nodes2Mutex.Unlock()
 
-	conf := &ssh.ClientConfig{
-		User: config.SshUser,
-		Auth: []ssh.AuthMethod{
-			ssh.Password(config.SshPassw),
-		},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		conf := &ssh.ClientConfig{
+			User: config.SshUser,
+			Auth: []ssh.AuthMethod{
+				ssh.Password(config.SshPassw),
+			},
+			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		}
+
+		client, err := ssh.Dial("tcp", fmt.Sprintf("%s:22", ip), conf)
+		if err != nil {
+			makeLog.Println(err)
+		}
+		makeLog.Println("SSH client -- YES!")
+
+		session, err := client.NewSession()
+		if err != nil {
+			makeLog.Println(err)
+		}
+		makeLog.Println("SSH session -- YES!")
+
+		strScript := script.GetString("/2/install.sh", generationId, makeLog)
+
+		output, err := session.CombinedOutput(strScript)
+		if err != nil {
+			makeLog.Println(err)
+		}
+		makeLog.Println(string(output))
+
+		client.Close()
+		session.Close()
+
+		makeLog.Println("ran script successfully")
+
+		total := time.Now().Sub(start).Seconds()
+
+		makeLog.Println("Create node IP ", ip, " total time ", total, " sec")
 	}
-
-	client, err := ssh.Dial("tcp", fmt.Sprintf("%s:22", ip), conf)
-	if err != nil {
-		makeLog.Println(err)
-	}
-	makeLog.Println("SSH client -- YES!")
-
-	session, err := client.NewSession()
-	if err != nil {
-		makeLog.Println(err)
-	}
-	makeLog.Println("SSH session -- YES!")
-
-	strScript := script.GetString("/2/install.sh", generationId, makeLog)
-
-	output, err := session.CombinedOutput(strScript)
-	if err != nil {
-		makeLog.Println(err)
-	}
-	makeLog.Println(string(output))
-
-	client.Close()
-	session.Close()
-
-	makeLog.Println("ran script successfully")
-
-	total := time.Now().Sub(start).Seconds()
-
-	makeLog.Println("Create node IP ", ip, " total time ", total, " sec")
 }
 
 func NewNode(ip string, generationId int) {

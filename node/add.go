@@ -49,10 +49,15 @@ func Make(ip string) {
 	makeLog.Println("Logger MyLog started, IP ", ip)
 
 	start := time.Now()
+	altNode := false
 
 	block.NodesMutex.Lock()
 	generationId := GetGenerationId()
-	NewNode(ip, generationId)
+	if generationId > GetGenerationsCount() {
+		altNode = true
+	} else {
+		NewNode(ip, generationId)
+	}
 	block.NodesMutex.Unlock()
 
 	conf := &ssh.ClientConfig{
@@ -75,9 +80,14 @@ func Make(ip string) {
 	}
 	makeLog.Println("SSH session -- YES!")
 
-	strScript := script.GetString("/1/install.sh", generationId, makeLog)
+	var strScript string
+	if altNode {
+		strScript = script.GetString("/1/alt.sh", generationId, makeLog)
+	} else {
+		strScript = script.GetString("/1/install.sh", generationId, makeLog)
+	}
 
-	if config.NodeNum > 1 {
+	if config.NodeNum > 1 && !altNode {
 		strScript += script.GetString("/1/add.sh", generationId, makeLog)
 	}
 
