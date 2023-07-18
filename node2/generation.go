@@ -2,30 +2,23 @@ package node2
 
 import (
 	"context"
+	"fmt"
 	"io/fs"
+	mainlog "log"
 	"path/filepath"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"nkn-server/config"
 	"nkn-server/db"
-	"nkn-server/log"
 )
 
 func GetGenerationId() int {
-	var id int
-	for id = 1; true; id++ {
-		filter := bson.D{{"generation", id}}
-		count, err := db.Node2Collection.CountDocuments(context.TODO(), filter)
-		if err != nil {
-			log.MyLog.Println(err)
-		}
-
-		if count == 0 {
-			break
-		}
+	count, err := db.Node2Collection.CountDocuments(context.TODO(), bson.D{{}})
+	if err != nil {
+		fmt.Println(err)
 	}
 
-	return id
+	return int(count)
 }
 
 func GetGenerationsCount() int {
@@ -45,7 +38,7 @@ func GetGenerationsCount() int {
 	})
 
 	if err != nil {
-		log.MyLog.Println(err)
+		mainlog.Println(err)
 	}
 
 	return count

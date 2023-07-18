@@ -12,7 +12,7 @@ import (
 )
 
 func Nodes2Get(w http.ResponseWriter, r *http.Request) {
-	log.MyLog.Println("Route NodesGet Started")
+	log.MyLog.Println("Route NodeGet2 Started")
 
 	var resp map[string]interface{}
 	resp = make(map[string]interface{})
@@ -28,6 +28,7 @@ func Nodes2Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func Node2Add(w http.ResponseWriter, r *http.Request) {
+	log.MyLog.Println("Route NodeAdd2 Started")
 	reqBody, _ := io.ReadAll(r.Body)
 
 	ip := gjson.Get(string(reqBody), "ip").String()
@@ -46,6 +47,7 @@ func Node2Add(w http.ResponseWriter, r *http.Request) {
 }
 
 func Node2Make(w http.ResponseWriter, r *http.Request) {
+	log.MyLog.Println("Route NodeMake2 Started")
 	reqBody, _ := io.ReadAll(r.Body)
 
 	ip := strings.Split(strings.TrimSpace(gjson.Get(string(reqBody), "ip").String()), " ")[0]

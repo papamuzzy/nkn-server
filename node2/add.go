@@ -52,6 +52,8 @@ func Make(ip string) {
 
 	block.Nodes2Mutex.Lock()
 	generationId := GetGenerationId()
+	makeLog.Println("gen Id ", generationId)
+	makeLog.Println("GenCount", GetGenerationsCount())
 	if generationId <= GetGenerationsCount() {
 		NewNode(ip, generationId)
 		block.Nodes2Mutex.Unlock()

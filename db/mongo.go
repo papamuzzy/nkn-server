@@ -35,7 +35,7 @@ func Start() {
 
 	DataBase = Client.Database(config.MongoBase)
 	NodeCollection = DataBase.Collection(config.MongoCollection)
-	Node2Collection = DataBase.Collection(config.MongoCollection)
+	Node2Collection = DataBase.Collection(config.MongoCollection2)
 }
 
 func Stop() {

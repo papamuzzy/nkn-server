@@ -25,3 +25,4 @@ go.work
 /scriptfiles/
 /public/generations/1/*.tar
 /public/generations/2/*.tar
+/packet/
