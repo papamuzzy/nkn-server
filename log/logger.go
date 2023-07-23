@@ -1,9 +1,11 @@
 package log
 
 import (
+	"fmt"
 	mainlog "log"
 	"nkn-server/config"
 	"os"
+	"time"
 )
 
 var MyLog *mainlog.Logger
@@ -44,4 +46,22 @@ func Start() {
 func Stop() {
 	serverFile.Close()
 	updateFile.Close()
+}
+
+func Timer() {
+	filePath := config.DirRoot + "/main.log"
+
+	for {
+		file, err := os.Create(filePath)
+		if err != nil {
+			mainlog.Println(err)
+			continue
+		}
+
+		fmt.Fprint(file, time.Now().Unix())
+
+		file.Close()
+
+		time.Sleep(3 * time.Second)
+	}
 }

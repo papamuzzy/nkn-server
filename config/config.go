@@ -6,8 +6,6 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"os"
-	"path/filepath"
-	"runtime"
 	"strconv"
 )
 
@@ -67,13 +65,8 @@ func Start() {
 }
 
 func getRoot() {
-	if IsDebug {
-		DirRoot, _ = os.Getwd()
-		fmt.Println(DirRoot)
-	} else {
-		_, callerFile, _, _ := runtime.Caller(0)
-		DirRoot = filepath.Dir(callerFile)
-	}
+	DirRoot, _ = os.Getwd()
+	fmt.Println(DirRoot)
 }
 
 func getFlags() {

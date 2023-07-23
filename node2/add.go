@@ -54,7 +54,9 @@ func Make(ip string) {
 	generationId := GetGenerationId()
 	makeLog.Println("gen Id ", generationId)
 	makeLog.Println("GenCount", GetGenerationsCount())
-	if generationId <= GetGenerationsCount() {
+	if generationId > GetGenerationsCount() {
+		block.Nodes2Mutex.Unlock()
+	} else {
 		NewNode(ip, generationId)
 		block.Nodes2Mutex.Unlock()
 
@@ -64,18 +66,23 @@ func Make(ip string) {
 				ssh.Password(config.SshPassw),
 			},
 			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+			Timeout:         600 * time.Second,
 		}
 
 		client, err := ssh.Dial("tcp", fmt.Sprintf("%s:22", ip), conf)
 		if err != nil {
 			makeLog.Println(err)
+			return
 		}
+		defer client.Close()
 		makeLog.Println("SSH client -- YES!")
 
 		session, err := client.NewSession()
 		if err != nil {
 			makeLog.Println(err)
+			return
 		}
+		defer session.Close()
 		makeLog.Println("SSH session -- YES!")
 
 		strScript := script.GetString("/2/install.sh", generationId, makeLog)
@@ -83,11 +90,9 @@ func Make(ip string) {
 		output, err := session.CombinedOutput(strScript)
 		if err != nil {
 			makeLog.Println(err)
+			return
 		}
 		makeLog.Println(string(output))
-
-		client.Close()
-		session.Close()
 
 		makeLog.Println("ran script successfully")
 

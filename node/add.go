@@ -18,7 +18,7 @@ import (
 	"nkn-server/log"
 )
 
-func Add(ip string, generationId int) {
+func Add(ip string, generationId int) bool {
 	block.NodesMutex.Lock()
 	defer block.NodesMutex.Unlock()
 
@@ -30,9 +30,11 @@ func Add(ip string, generationId int) {
 
 	if count > 0 {
 		log.MyLog.Println("there's such ip")
+		return false
 	} else {
 		log.MyLog.Println("there no node with such ip")
 		NewNode(ip, generationId)
+		return true
 	}
 }
 
@@ -66,18 +68,23 @@ func Make(ip string) {
 			ssh.Password(config.SshPassw),
 		},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		Timeout:         600 * time.Second,
 	}
 
 	client, err := ssh.Dial("tcp", fmt.Sprintf("%s:22", ip), conf)
 	if err != nil {
 		makeLog.Println(err)
+		return
 	}
+	defer client.Close()
 	makeLog.Println("SSH client -- YES!")
 
 	session, err := client.NewSession()
 	if err != nil {
 		makeLog.Println(err)
+		return
 	}
+	defer session.Close()
 	makeLog.Println("SSH session -- YES!")
 
 	var strScript string
@@ -94,11 +101,9 @@ func Make(ip string) {
 	output, err := session.CombinedOutput(strScript)
 	if err != nil {
 		makeLog.Println(err)
+		return
 	}
 	makeLog.Println(string(output))
-
-	client.Close()
-	session.Close()
 
 	makeLog.Println("ran script successfully")
 

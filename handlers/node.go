@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"nkn-server/log"
 	"nkn-server/node"
+	"strconv"
 	"strings"
 )
 
@@ -20,10 +21,27 @@ type RequestData struct {
 func NodesGet(w http.ResponseWriter, r *http.Request) {
 	log.MyLog.Println("Route NodesGet Started")
 
+	qLimit := r.URL.Query().Get("limit")
+	if qLimit == "" {
+		qLimit = "20"
+	}
+	limit, _ := strconv.Atoi(qLimit)
+
+	qOffset := r.URL.Query().Get("offset")
+	if qOffset == "" {
+		qOffset = "0"
+	}
+
+	offset, _ := strconv.Atoi(qOffset)
+
+	log.MyLog.Printf("Limit %#v; Offset %#v\n", limit, offset)
+
 	var resp map[string]interface{}
 	resp = make(map[string]interface{})
 
-	resp["Nodes"] = node.GetAll()
+	resp["Nodes"], resp["Total"] = node.GetAll(int64(limit), int64(offset))
+	resp["Limit"] = limit
+	resp["Offset"] = offset
 
 	response := UserResponse{Status: http.StatusOK, Message: "NodesGet success", Data: map[string]interface{}{"resp": resp}}
 
@@ -39,11 +57,15 @@ func NodeAdd(w http.ResponseWriter, r *http.Request) {
 	ip := gjson.Get(string(reqBody), "ip").String()
 	generation := int(gjson.Get(string(reqBody), "generation_id").Int())
 
+	mess := "Error"
 	if ip != "" && generation > 0 {
-		node.Add(ip, generation)
+		res := node.Add(ip, generation)
+		if res {
+			mess = "Ok"
+		}
 	}
 
-	response := UserResponse{Status: http.StatusOK, Message: "NodeAdd success", Data: map[string]interface{}{}}
+	response := UserResponse{Status: http.StatusOK, Message: mess, Data: map[string]interface{}{}}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

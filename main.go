@@ -19,6 +19,8 @@ func main() {
 	db.Start()
 	defer db.Stop()
 
+	go log.Timer()
+
 	go node.UpdateBase()
 	if config.NodeNum > 1 {
 		go node2.UpdateBase()
